@@ -8,7 +8,7 @@
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- Header -->
-    <header class="bg-white border-b border-gray-200">
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center py-6">
                 <div class="flex items-center space-x-6">
@@ -17,17 +17,17 @@
                         <span class="text-sm text-gray-500">Total:</span>
                         <span id="total-products" class="text-sm font-medium text-gray-900">0 products</span>
                     </div>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <button id="add-product-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                        Add Product
-                    </button>
                     <div class="flex items-center space-x-3">
                         <span class="text-sm text-gray-500">Status:</span>
                         <span id="connection-status" class="px-2 py-1 rounded text-xs font-medium bg-yellow-100 text-yellow-700">
                             Checking...
                         </span>
                     </div>
+                </div>
+                <div class="flex items-center">
+                    <button id="add-product-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                        Add Product
+                    </button>
                 </div>
             </div>
         </div>
