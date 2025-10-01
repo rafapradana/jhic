@@ -723,7 +723,7 @@ jhic/
 
 
 <p align="center">
-  <strong>🏆 JHIC Bootcamp Project 2024</strong><br>
+  <strong>🏆 JHIC Bootcamp Project 2025</strong><br>
   Built with ❤️ using Laravel
 </p>
 
