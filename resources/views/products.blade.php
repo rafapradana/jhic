@@ -5,6 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Products - JHIC</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        /* Responsive filter behavior */
+        @media (max-width: 1024px) {
+            #filters-section {
+                display: none !important;
+            }
+            #filters-section.show-mobile {
+                display: block !important;
+            }
+        }
+        
+        /* Smooth transitions for filter toggles */
+        #filters-section {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        /* Filter indicator animations */
+        .filter-indicator {
+            animation: fadeIn 0.2s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- Header -->
@@ -71,64 +97,92 @@
             </div>
         </div>
 
-        <!-- Filters Section -->
-        <div id="filters-section" class="hidden bg-white border border-gray-200 rounded-lg p-6 mb-6">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-medium text-gray-900">Filters</h3>
-                <button id="clear-filters" class="text-sm text-gray-500 hover:text-gray-700 transition-colors">
-                    Clear All
+        <!-- Results Summary & Active Filters -->
+        <div id="results-summary" class="hidden mb-6">
+            <!-- Results Count -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+                <div class="flex items-center gap-3">
+                    <h2 class="text-lg font-semibold text-gray-900" id="results-count">0 products found</h2>
+                    <button id="toggle-filters" class="lg:hidden inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m0 12h9.75m-9.75 0a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 18H7.5" />
+                        </svg>
+                        <span id="filter-toggle-text">Show Filters</span>
+                    </button>
+                </div>
+                
+                <!-- Clear All Filters (when filters are active) -->
+                <button id="clear-all-filters" class="hidden text-sm text-red-600 hover:text-red-700 font-medium transition-colors">
+                    Clear All Filters
                 </button>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-                <!-- Price Range Filter -->
-                <div class="space-y-2">
-                    <label class="block text-sm font-medium text-gray-700">Price Range</label>
-                    <div class="flex space-x-2">
+            <!-- Active Filter Badges -->
+            <div id="active-filters" class="hidden">
+                <div class="flex flex-wrap gap-2" id="filter-badges">
+                    <!-- Filter badges will be inserted here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters Section -->
+        <div id="filters-section" class="hidden bg-white border border-gray-200 rounded-lg shadow-sm mb-6 p-4">
+            <!-- Compact Filter Row -->
+            <div class="flex flex-wrap items-end gap-3">
+                <!-- Price Range -->
+                <div class="flex-1 min-w-[120px]">
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Price</label>
+                    <div class="flex gap-1">
                         <input type="number" id="min-price" placeholder="Min" 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                               class="w-full px-2 py-1.5 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500">
+                        <span class="text-xs text-gray-400 self-center">-</span>
                         <input type="number" id="max-price" placeholder="Max" 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                               class="w-full px-2 py-1.5 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500">
                     </div>
                 </div>
 
-                <!-- Stock Range Filter -->
-                <div class="space-y-2">
-                    <label class="block text-sm font-medium text-gray-700">Stock Range</label>
-                    <div class="flex space-x-2">
+                <!-- Stock Range -->
+                <div class="flex-1 min-w-[120px]">
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Stock</label>
+                    <div class="flex gap-1">
                         <input type="number" id="min-stock" placeholder="Min" 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                               class="w-full px-2 py-1.5 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500">
+                        <span class="text-xs text-gray-400 self-center">-</span>
                         <input type="number" id="max-stock" placeholder="Max" 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                               class="w-full px-2 py-1.5 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500">
                     </div>
                 </div>
 
-                <!-- Category Filter -->
-                <div class="space-y-2">
-                    <label class="block text-sm font-medium text-gray-700">Category</label>
+                <!-- Category -->
+                <div class="flex-1 min-w-[120px]">
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Category</label>
                     <select id="category-filter" 
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            class="w-full px-2 py-1.5 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white">
                         <option value="">All Categories</option>
                         <!-- Categories will be populated dynamically -->
                     </select>
                 </div>
 
-                <!-- Status Filter -->
-                <div class="space-y-2">
-                    <label class="block text-sm font-medium text-gray-700">Status</label>
+                <!-- Status -->
+                <div class="flex-1 min-w-[100px]">
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Status</label>
                     <select id="status-filter" 
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            class="w-full px-2 py-1.5 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white">
                         <option value="">All Status</option>
                         <option value="1">Active</option>
                         <option value="0">Inactive</option>
                     </select>
                 </div>
 
-                <!-- Apply Filter Button -->
-                <div class="flex items-end">
+                <!-- Action Buttons -->
+                <div class="flex gap-2">
+                    <button id="clear-filters" 
+                            class="px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded hover:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-500 transition-all">
+                        Clear
+                    </button>
                     <button id="apply-filters" 
-                            class="w-full bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors">
-                        Apply Filters
+                            class="px-3 py-1.5 text-xs font-semibold text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all">
+                        Apply
                     </button>
                 </div>
             </div>
@@ -136,12 +190,12 @@
 
         <!-- Products Grid -->
         <div id="products-container" class="hidden">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="products-grid">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="products-grid">
                 <!-- Products will be inserted here by JavaScript -->
             </div>
             
             <!-- Pagination Container -->
-            <div id="pagination-container" class="mt-8 flex justify-center hidden">
+            <div id="pagination-container" class="mt-12 justify-center hidden">
                 <!-- Pagination will be inserted here by JavaScript -->
             </div>
         </div>
@@ -212,6 +266,9 @@
                         currentSearch = search;
                         totalPages = data.pagination.last_page;
                         
+                        // Update filter indicators with total count
+                        updateFilterIndicators(filters, data.pagination.total);
+                        
                         if (data.data && data.data.length > 0) {
                             // Show products container
                             document.getElementById('products-container').classList.remove('hidden');
@@ -226,16 +283,20 @@
                             document.getElementById('empty-state').classList.remove('hidden');
                             
                             // Hide pagination
-                            const paginationContainer = document.getElementById('pagination-container');
-                            if (paginationContainer) {
-                                paginationContainer.classList.add('hidden');
-                            }
+            const paginationContainer = document.getElementById('pagination-container');
+            if (paginationContainer) {
+                paginationContainer.classList.add('hidden');
+                paginationContainer.classList.remove('flex');
+            }
                         }
                     } else {
                         // Fallback for non-paginated response
                         currentPage = 1;
                         currentSearch = search;
                         totalPages = 1;
+                        
+                        // Update filter indicators with data length
+                        updateFilterIndicators(filters, data.data ? data.data.length : 0);
                         
                         if (data.data && data.data.length > 0) {
                             // Show products container
@@ -262,6 +323,7 @@
                     const paginationContainer = document.getElementById('pagination-container');
                     if (paginationContainer) {
                         paginationContainer.classList.add('hidden');
+                        paginationContainer.classList.remove('flex');
                     }
                 }
                 
@@ -292,36 +354,36 @@
             }
             
             grid.innerHTML = products.map(product => `
-                <div class="bg-white border border-gray-200 rounded-lg p-5 hover:border-gray-300 transition-colors">
+                <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md hover:border-gray-300 transition-all duration-200 group">
                     <!-- Header with title and actions -->
-                    <div class="flex items-start justify-between mb-3">
+                    <div class="flex items-start justify-between mb-4">
                         <div class="flex-1 min-w-0">
-                            <h3 class="text-base font-medium text-gray-900 leading-tight truncate">${product.name}</h3>
-                            <div class="flex items-center mt-1 space-x-2">
-                                <span class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${product.category ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-gray-50 text-gray-500 border border-gray-200'}">
-                                    <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <h3 class="text-lg font-semibold text-gray-900 leading-tight truncate group-hover:text-blue-600 transition-colors">${product.name}</h3>
+                            <div class="flex items-center mt-2 gap-2 flex-wrap">
+                                <span class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full ${product.category ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-gray-50 text-gray-500 border border-gray-200'}">
+                                    <svg class="w-3 h-3 mr-1.5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" />
                                     </svg>
                                     ${product.category || 'No Category'}
                                 </span>
-                                <span class="px-2 py-1 text-xs font-medium rounded-full ${product.is_active ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}">
+                                <span class="px-3 py-1 text-xs font-semibold rounded-full ${product.is_active ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}">
                                     ${product.is_active ? 'Active' : 'Inactive'}
                                 </span>
                             </div>
                         </div>
-                        <div class="flex space-x-1 ml-3">
+                        <div class="flex gap-1 ml-4">
                             <button onclick="editProduct(${product.id})" 
-                                    class="p-1 text-gray-400 hover:text-blue-600 transition-colors" 
-                                    title="Edit">
+                                    class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200" 
+                                    title="Edit Product">
                                 <!-- Heroicons: pencil -->
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
                                 </svg>
                             </button>
                             <button onclick="deleteProduct(${product.id}, '${product.name.replace(/'/g, "\\'")}')"
-                                    class="p-1 text-gray-400 hover:text-red-600 transition-colors" 
-                                    title="Delete">
+                                    class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200" 
+                                    title="Delete Product">
                                 <!-- Heroicons: trash -->
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
@@ -331,61 +393,61 @@
                     </div>
                     
                     <!-- Description -->
-                    <p class="text-gray-600 text-sm mb-4 line-clamp-2">${product.description || 'No description'}</p>
+                    <p class="text-gray-600 text-sm mb-5 line-clamp-2 leading-relaxed">${product.description || 'No description available'}</p>
                     
                     <!-- Price and Stock -->
-                    <div class="space-y-3 mb-4">
+                    <div class="space-y-4 mb-5">
                         <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-500">Price</span>
-                            <span class="text-base font-semibold text-gray-900">Rp ${parseFloat(product.price).toLocaleString('id-ID')}</span>
+                            <span class="text-sm font-medium text-gray-500">Price</span>
+                            <span class="text-lg font-bold text-gray-900">Rp ${parseFloat(product.price).toLocaleString('id-ID')}</span>
                         </div>
                         
                         <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-500">Stock</span>
-                            <span class="text-sm font-medium ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}">
-                                ${product.stock} units
-                            </span>
+                            <span class="text-sm font-medium text-gray-500">Stock</span>
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 rounded-full ${product.stock > 10 ? 'bg-green-400' : product.stock > 0 ? 'bg-yellow-400' : 'bg-red-400'}"></div>
+                                <span class="text-sm font-semibold ${product.stock > 10 ? 'text-green-600' : product.stock > 0 ? 'text-yellow-600' : 'text-red-600'}">
+                                    ${product.stock} units
+                                </span>
+                            </div>
                         </div>
                     </div>
                     
                     <!-- Timestamps -->
-                    <div class="pt-3 border-t border-gray-100">
-                        <div class="grid grid-cols-2 gap-3 text-xs">
-                            <div class="flex flex-col">
-                                <span class="text-gray-400 mb-1">Created</span>
-                                <span class="text-gray-600 font-medium">
+                    <div class="pt-4 border-t border-gray-100">
+                        <div class="grid grid-cols-2 gap-4 text-xs">
+                            <div class="space-y-1">
+                                <span class="text-gray-400 font-medium uppercase tracking-wide">Created</span>
+                                <div class="text-gray-700 font-semibold">
                                     ${new Date(product.created_at).toLocaleDateString('id-ID', {
                                         day: '2-digit',
                                         month: 'short',
                                         year: 'numeric'
                                     })}
-                                </span>
-                                <span class="text-gray-400 text-xs">
+                                </div>
+                                <div class="text-gray-500">
                                     ${new Date(product.created_at).toLocaleTimeString('id-ID', {
                                         hour: '2-digit',
                                         minute: '2-digit'
                                     })}
-                                </span>
+                                </div>
                             </div>
-                            <div class="flex flex-col">
-                                <span class="text-gray-400 mb-1">Updated</span>
-                                <span class="text-gray-600 font-medium">
+                            <div class="space-y-1">
+                                <span class="text-gray-400 font-medium uppercase tracking-wide">Updated</span>
+                                <div class="text-gray-700 font-semibold">
                                     ${new Date(product.updated_at).toLocaleDateString('id-ID', {
                                         day: '2-digit',
                                         month: 'short',
                                         year: 'numeric'
                                     })}
-                                </span>
-                                <span class="text-gray-400 text-xs">
+                                </div>
+                                <div class="text-gray-500">
                                     ${new Date(product.updated_at).toLocaleTimeString('id-ID', {
                                         hour: '2-digit',
                                         minute: '2-digit'
                                     })}
-                                </span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="mt-2 pt-2 border-t border-gray-50">
-                            <span class="text-xs text-gray-400">ID: ${product.id}</span>
                         </div>
                     </div>
                 </div>
@@ -407,10 +469,12 @@
             
             if (pagination.last_page <= 1) {
                 paginationContainer.classList.add('hidden');
+                paginationContainer.classList.remove('flex');
                 return;
             }
             
             paginationContainer.classList.remove('hidden');
+            paginationContainer.classList.add('flex');
             
             let paginationHTML = '<div class="flex items-center space-x-2">';
             
@@ -496,6 +560,172 @@
             loadProducts(1, currentSearch, currentFilters);
         }
 
+        // Update filter indicators and count
+        function updateFilterIndicators(filters, totalResults = 0) {
+            const indicatorsContainer = document.getElementById('active-filters');
+            const countElement = document.getElementById('results-count');
+            const clearAllBtn = document.getElementById('clear-all-filters');
+            
+            // Update results count
+            if (countElement) {
+                countElement.textContent = `${totalResults} products found`;
+            }
+            
+            // Clear existing indicators
+            indicatorsContainer.innerHTML = '';
+            
+            let hasActiveFilters = false;
+            
+            // Price range filter
+            if (filters.minPrice || filters.maxPrice) {
+                hasActiveFilters = true;
+                const priceText = filters.minPrice && filters.maxPrice 
+                    ? `Price: Rp ${parseInt(filters.minPrice).toLocaleString('id-ID')} - Rp ${parseInt(filters.maxPrice).toLocaleString('id-ID')}`
+                    : filters.minPrice 
+                        ? `Price: ≥ Rp ${parseInt(filters.minPrice).toLocaleString('id-ID')}`
+                        : `Price: ≤ Rp ${parseInt(filters.maxPrice).toLocaleString('id-ID')}`;
+                        
+                indicatorsContainer.innerHTML += `
+                    <span class="filter-indicator inline-flex items-center gap-1 px-3 py-1 text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200 rounded-full">
+                        ${priceText}
+                        <button onclick="clearPriceFilter()" class="ml-1 hover:bg-blue-200 rounded-full p-0.5">
+                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </span>
+                `;
+            }
+            
+            // Stock range filter
+            if (filters.minStock || filters.maxStock) {
+                hasActiveFilters = true;
+                const stockText = filters.minStock && filters.maxStock 
+                    ? `Stock: ${filters.minStock} - ${filters.maxStock} units`
+                    : filters.minStock 
+                        ? `Stock: ≥ ${filters.minStock} units`
+                        : `Stock: ≤ ${filters.maxStock} units`;
+                        
+                indicatorsContainer.innerHTML += `
+                    <span class="filter-indicator inline-flex items-center gap-1 px-3 py-1 text-xs font-medium bg-green-50 text-green-700 border border-green-200 rounded-full">
+                        ${stockText}
+                        <button onclick="clearStockFilter()" class="ml-1 hover:bg-green-200 rounded-full p-0.5">
+                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </span>
+                `;
+            }
+            
+            // Category filter
+            if (filters.category) {
+                hasActiveFilters = true;
+                indicatorsContainer.innerHTML += `
+                    <span class="filter-indicator inline-flex items-center gap-1 px-3 py-1 text-xs font-medium bg-purple-50 text-purple-700 border border-purple-200 rounded-full">
+                        Category: ${filters.category}
+                        <button onclick="clearCategoryFilter()" class="ml-1 hover:bg-purple-200 rounded-full p-0.5">
+                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </span>
+                `;
+            }
+            
+            // Status filter
+            if (filters.status) {
+                hasActiveFilters = true;
+                const statusText = filters.status === '1' ? 'Active' : 'Inactive';
+                const statusColor = filters.status === '1' ? 'green' : 'red';
+                indicatorsContainer.innerHTML += `
+                    <span class="filter-indicator inline-flex items-center gap-1 px-3 py-1 text-xs font-medium bg-${statusColor}-50 text-${statusColor}-700 border border-${statusColor}-200 rounded-full">
+                        Status: ${statusText}
+                        <button onclick="clearStatusFilter()" class="ml-1 hover:bg-${statusColor}-200 rounded-full p-0.5">
+                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </span>
+                `;
+            }
+            
+            // Show/hide clear all button
+            if (clearAllBtn) {
+                clearAllBtn.style.display = hasActiveFilters ? 'inline-flex' : 'none';
+            }
+        }
+
+        // Individual filter clear functions
+        function clearPriceFilter() {
+            document.getElementById('min-price').value = '';
+            document.getElementById('max-price').value = '';
+            applyFilters();
+        }
+
+        function clearStockFilter() {
+            document.getElementById('min-stock').value = '';
+            document.getElementById('max-stock').value = '';
+            applyFilters();
+        }
+
+        function clearCategoryFilter() {
+            document.getElementById('category-filter').value = '';
+            applyFilters();
+        }
+
+        function clearStatusFilter() {
+            document.getElementById('status-filter').value = '';
+            applyFilters();
+        }
+
+        // Toggle filters visibility on mobile
+        function toggleFilters() {
+            const filtersSection = document.getElementById('filters-section');
+            const toggleBtn = document.getElementById('toggle-filters');
+            const toggleText = document.getElementById('filter-toggle-text');
+            const toggleSvg = toggleBtn.querySelector('svg');
+            
+            // Check if we're on mobile
+            const isMobile = window.innerWidth < 1024;
+            
+            if (isMobile) {
+                // Mobile behavior - toggle show-mobile class
+                const isVisible = filtersSection.classList.contains('show-mobile');
+                
+                if (isVisible) {
+                    filtersSection.classList.remove('show-mobile');
+                    toggleText.textContent = 'Show Filters';
+                    toggleSvg.innerHTML = `
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m0 12h9.75m-9.75 0a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 18H7.5" />
+                    `;
+                } else {
+                    filtersSection.classList.add('show-mobile');
+                    toggleText.textContent = 'Show Filters';
+                    toggleSvg.innerHTML = `
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    `;
+                }
+            } else {
+                // Desktop behavior - toggle hidden class
+                const isHidden = filtersSection.classList.contains('hidden');
+                
+                if (isHidden) {
+                    filtersSection.classList.remove('hidden');
+                    toggleText.textContent = 'Show Filters';
+                    toggleSvg.innerHTML = `
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    `;
+                } else {
+                    filtersSection.classList.add('hidden');
+                    toggleText.textContent = 'Show Filters';
+                    toggleSvg.innerHTML = `
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m0 12h9.75m-9.75 0a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 18H7.5" />
+                    `;
+                }
+            }
+        }
+
         // Load unique categories for filter dropdown
         async function loadCategories() {
             try {
@@ -554,7 +784,7 @@
     </script>
 
     <!-- Product Form Modal -->
-    <div id="product-modal" class="hidden fixed inset-0 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
+    <div id="product-modal" class="hidden fixed inset-0 overflow-y-auto h-full w-full z-50 p-4">
         <div class="relative w-full max-w-md max-h-[90vh] overflow-y-auto bg-white rounded-lg shadow-xl border border-gray-200">
             <div class="p-6">
                 <div class="flex justify-between items-center mb-6">
@@ -619,7 +849,7 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div id="delete-modal" class="hidden fixed inset-0 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
+    <div id="delete-modal" class="hidden fixed inset-0 overflow-y-auto h-full w-full z-50 p-4">
         <div class="relative w-full max-w-sm bg-white rounded-lg shadow-xl border border-gray-200">
             <div class="p-6 text-center">
                 <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
@@ -657,10 +887,12 @@
         // Show/hide modals
         function showModal(modal) {
             modal.classList.remove('hidden');
+            modal.classList.add('flex', 'items-center', 'justify-center');
         }
 
         function hideModal(modal) {
             modal.classList.add('hidden');
+            modal.classList.remove('flex', 'items-center', 'justify-center');
         }
 
         // Event listeners for modal controls
@@ -807,6 +1039,26 @@
                 notification.remove();
             }, 5000);
         }
+
+        // Event listeners for filter functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle filters button
+            const toggleFiltersBtn = document.getElementById('toggle-filters');
+            if (toggleFiltersBtn) {
+                toggleFiltersBtn.addEventListener('click', toggleFilters);
+            }
+
+            // Clear all filters button
+            const clearAllFiltersBtn = document.getElementById('clear-all-filters');
+            if (clearAllFiltersBtn) {
+                clearAllFiltersBtn.addEventListener('click', function() {
+                    clearFilters();
+                });
+            }
+
+            // Initialize filter indicators on page load
+            updateFilterIndicators(currentFilters, 0);
+        });
     </script>
 </body>
 </html>
