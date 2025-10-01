@@ -12,16 +12,77 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         try {
-            $products = Product::all();
+            $query = Product::query();
+            
+            // Search functionality
+            if ($request->has('search') && !empty($request->search)) {
+                $searchTerm = $request->search;
+                $query->where(function($q) use ($searchTerm) {
+                    $q->where('name', 'LIKE', "%{$searchTerm}%")
+                      ->orWhere('description', 'LIKE', "%{$searchTerm}%");
+                });
+            }
+            
+            // Filter by price range
+            if ($request->has('min_price') && is_numeric($request->min_price)) {
+                $query->where('price', '>=', $request->min_price);
+            }
+            if ($request->has('max_price') && is_numeric($request->max_price)) {
+                $query->where('price', '<=', $request->max_price);
+            }
+            
+            // Filter by stock range
+            if ($request->has('min_stock') && is_numeric($request->min_stock)) {
+                $query->where('stock', '>=', $request->min_stock);
+            }
+            if ($request->has('max_stock') && is_numeric($request->max_stock)) {
+                $query->where('stock', '<=', $request->max_stock);
+            }
+            
+            // Filter by category
+            if ($request->has('category') && !empty($request->category)) {
+                $query->where('category', $request->category);
+            }
+            
+            // Filter by status (is_active)
+            if ($request->has('is_active') && $request->is_active !== '') {
+                $query->where('is_active', $request->is_active === '1' || $request->is_active === 'true');
+            }
+            
+            // Legacy status filter support
+            if ($request->has('status') && in_array($request->status, ['active', 'inactive'])) {
+                $query->where('is_active', $request->status === 'active');
+            }
+            
+            // Get pagination parameters
+            $perPage = $request->get('per_page', 10); // Default 10 items per page
+            $perPage = min(max($perPage, 1), 100); // Limit between 1-100
+            
+            // Get paginated results
+            $products = $query->orderBy('created_at', 'desc')->paginate($perPage);
             
             return response()->json([
                 'success' => true,
                 'message' => 'Products retrieved successfully',
-                'total' => $products->count(),
-                'data' => $products
+                'data' => $products->items(),
+                'pagination' => [
+                    'current_page' => $products->currentPage(),
+                    'last_page' => $products->lastPage(),
+                    'per_page' => $products->perPage(),
+                    'total' => $products->total(),
+                    'from' => $products->firstItem(),
+                    'to' => $products->lastItem(),
+                    'has_more_pages' => $products->hasMorePages(),
+                    'prev_page_url' => $products->previousPageUrl(),
+                    'next_page_url' => $products->nextPageUrl()
+                ],
+                'search' => [
+                    'term' => $request->get('search', ''),
+                    'status_filter' => $request->get('status', 'all')
+                ]
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -172,6 +233,33 @@ class ProductController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to delete product',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get unique categories from products.
+     */
+    public function categories(): JsonResponse
+    {
+        try {
+            $categories = Product::whereNotNull('category')
+                ->where('category', '!=', '')
+                ->distinct()
+                ->pluck('category')
+                ->sort()
+                ->values();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Categories retrieved successfully',
+                'data' => $categories
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve categories',
                 'error' => $e->getMessage()
             ], 500);
         }
