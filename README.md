@@ -158,6 +158,51 @@ CREATE TABLE products (
 | `created_at` | TIMESTAMP | Creation time | Auto-generated |
 | `updated_at` | TIMESTAMP | Last update time | Auto-generated |
 
+### 🌱 **Database Seeder:**
+
+#### **ProductSeeder** - Sample Data Generator
+Seeder ini menggunakan **Faker** untuk menghasilkan 200 data produk realistis dengan karakteristik:
+
+**📋 Data yang Dihasilkan:**
+- **Nama Produk:** Kombinasi kategori + nama produk (contoh: "Laptop Gaming ASUS ROG")
+- **Deskripsi:** Deskripsi detail produk dalam bahasa Indonesia
+- **Harga:** Range Rp 10.000 - Rp 50.000.000 (sesuai kategori)
+- **Stok:** 0-100 unit (dengan 10% kemungkinan out of stock)
+- **Kategori:** 8 kategori utama (Elektronik, Fashion, Makanan, dll.)
+- **Status:** 95% aktif, 5% non-aktif
+
+**🎯 Kategori Produk:**
+| Kategori | Contoh Produk | Range Harga |
+|----------|---------------|-------------|
+| Elektronik | Laptop, Smartphone, TV | Rp 500K - 50M |
+| Fashion | Baju, Sepatu, Tas | Rp 50K - 2M |
+| Makanan | Snack, Minuman, Frozen | Rp 10K - 500K |
+| Kesehatan | Vitamin, Obat, Suplemen | Rp 25K - 1M |
+| Olahraga | Sepatu Lari, Bola, Raket | Rp 100K - 5M |
+| Buku | Novel, Textbook, Komik | Rp 15K - 300K |
+| Mainan | Action Figure, Board Game | Rp 50K - 1M |
+| Rumah Tangga | Peralatan Dapur, Furniture | Rp 25K - 10M |
+
+**⚡ Cara Menjalankan:**
+```bash
+# Jalankan seeder khusus ProductSeeder
+php artisan db:seed --class=ProductSeeder
+
+# Atau jalankan semua seeders
+php artisan db:seed
+
+# Reset database dan jalankan ulang seeder
+php artisan migrate:fresh --seed
+```
+
+**✅ Verifikasi Data:**
+```bash
+# Cek jumlah data di database
+php artisan tinker
+>>> App\Models\Product::count()
+>>> App\Models\Product::take(5)->get()
+```
+
 ---
 
 ## 🔄 Application Flow
@@ -294,7 +339,12 @@ php artisan key:generate
 # Update .env file dengan kredensial MySQL
 php artisan migrate
 
-# 6. Start development servers
+# 6. Seed database dengan sample data (opsional)
+php artisan db:seed --class=ProductSeeder
+# Atau jalankan semua seeders:
+# php artisan db:seed
+
+# 7. Start development servers
 npm run dev
 ```
 
