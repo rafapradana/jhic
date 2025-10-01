@@ -16,10 +16,21 @@
   <img src="https://img.shields.io/badge/Vite-7.0-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite">
 </p>
 
+## 📸 Preview Aplikasi
+
+<p align="center">
+  <img src="public/images/preview.png" width="800" alt="Preview Aplikasi JHIC Sistem Manajemen Produk">
+</p>
+
+<p align="center">
+  <em>Tampilan utama aplikasi</em>
+</p>
+
 ---
 
 ## 📋 Daftar Isi
 
+- [📸 Preview Aplikasi](#-preview-aplikasi)
 - [🎯 Tujuan Proyek](#-tujuan-proyek)
 - [🏗️ Arsitektur Sistem](#️-arsitektur-sistem)
 - [🛠️ Tech Stack](#️-tech-stack)
