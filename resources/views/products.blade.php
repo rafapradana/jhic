@@ -826,9 +826,20 @@
                     
                     <div class="mb-4">
                         <label for="product-category" class="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                        <input type="text" id="product-category" name="category" 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                               placeholder="Enter product category">
+                        <select id="product-category" name="category" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Select Category</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Fashion">Fashion</option>
+                            <option value="Home & Garden">Home & Garden</option>
+                            <option value="Sports & Outdoors">Sports & Outdoors</option>
+                            <option value="Books">Books</option>
+                            <option value="Health & Beauty">Health & Beauty</option>
+                            <option value="Automotive">Automotive</option>
+                            <option value="Food & Beverages">Food & Beverages</option>
+                            <option value="Toys & Games">Toys & Games</option>
+                            <option value="Office Supplies">Office Supplies</option>
+                        </select>
                     </div>
                     
                     <div class="mb-6">

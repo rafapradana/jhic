@@ -6,6 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
+    const CATEGORIES = [
+        'Electronics',
+        'Fashion',
+        'Home & Garden',
+        'Sports & Outdoors',
+        'Books',
+        'Health & Beauty',
+        'Automotive',
+        'Food & Beverages',
+        'Toys & Games',
+        'Office Supplies'
+    ];
+
     protected $fillable = [
         'name',
         'description',
@@ -19,4 +32,9 @@ class Product extends Model
         'price' => 'decimal:2',
         'is_active' => 'boolean'
     ];
+
+    public static function getCategories()
+    {
+        return self::CATEGORIES;
+    }
 }

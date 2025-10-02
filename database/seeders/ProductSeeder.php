@@ -16,19 +16,8 @@ class ProductSeeder extends Seeder
     {
         $faker = Faker::create('id_ID'); 
         
-        // Define realistic product categories
-        $categories = [
-            'Electronics',
-            'Fashion',
-            'Home & Garden',
-            'Sports & Outdoors',
-            'Books',
-            'Health & Beauty',
-            'Automotive',
-            'Food & Beverages',
-            'Toys & Games',
-            'Office Supplies'
-        ];
+        // Get categories from Product model
+        $categories = Product::getCategories();
         
         // Define product name prefixes by category for more realistic names
         $productPrefixes = [
