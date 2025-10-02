@@ -824,6 +824,13 @@
                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     
+                    <div class="mb-4">
+                        <label for="product-category" class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                        <input type="text" id="product-category" name="category" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               placeholder="Enter product category">
+                    </div>
+                    
                     <div class="mb-6">
                         <label for="product-status" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
                         <select id="product-status" name="status" required
@@ -980,6 +987,7 @@
                         document.getElementById('product-description').value = product.description || '';
                         document.getElementById('product-price').value = product.price;
                         document.getElementById('product-stock').value = product.stock;
+                        document.getElementById('product-category').value = product.category || '';
                         document.getElementById('product-status').value = product.is_active ? 'active' : 'inactive';
                         
                         document.getElementById('modal-title').textContent = 'Edit Product';
