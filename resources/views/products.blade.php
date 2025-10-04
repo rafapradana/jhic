@@ -39,7 +39,7 @@
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between py-4 sm:py-6 gap-4">
                 <!-- Title -->
                 <div class="flex-shrink-0">
-                    <h1 class="text-xl sm:text-2xl font-semibold text-gray-900">JHIC Products</h1>
+                    <h1 class="text-xl sm:text-2xl font-semibold text-gray-900">JHIC Product Management</h1>
                 </div>
                 
                 <!-- Search input - responsive width -->
