@@ -12,15 +12,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Add API rate limiting
-        $middleware->api([
-            'throttle:api'
-        ]);
-        
-        // Add CSRF protection for web routes
-        $middleware->web([
-            'throttle:web'
-        ]);
+        //
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
