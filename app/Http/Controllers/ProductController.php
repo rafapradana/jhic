@@ -57,12 +57,35 @@ class ProductController extends Controller
                 $query->where('is_active', $request->status === 'active');
             }
             
+            // Sorting functionality
+            $sortBy = $request->get('sort_by', 'updated_at_desc'); // Default to last updated
+            $allowedSorts = [
+                'updated_at_desc' => ['updated_at', 'desc'],
+                'updated_at_asc' => ['updated_at', 'asc'],
+                'created_at_desc' => ['created_at', 'desc'],
+                'created_at_asc' => ['created_at', 'asc'],
+                'name_asc' => ['name', 'asc'],
+                'name_desc' => ['name', 'desc'],
+                'price_asc' => ['price', 'asc'],
+                'price_desc' => ['price', 'desc'],
+                'stock_asc' => ['stock', 'asc'],
+                'stock_desc' => ['stock', 'desc']
+            ];
+            
+            if (array_key_exists($sortBy, $allowedSorts)) {
+                [$column, $direction] = $allowedSorts[$sortBy];
+                $query->orderBy($column, $direction);
+            } else {
+                // Fallback to default sorting
+                $query->orderBy('updated_at', 'desc');
+            }
+            
             // Get pagination parameters
             $perPage = $request->get('per_page', 10); // Default 10 items per page
             $perPage = min(max($perPage, 1), 100); // Limit between 1-100
             
             // Get paginated results
-            $products = $query->orderBy('created_at', 'desc')->paginate($perPage);
+            $products = $query->paginate($perPage);
             
             return response()->json([
                 'success' => true,
@@ -104,6 +127,7 @@ class ProductController extends Controller
                 'description' => 'nullable|string',
                 'price' => 'required|numeric|min:0',
                 'stock' => 'required|integer|min:0',
+                'category' => 'required|in:Electronics,Fashion,Home & Garden,Sports & Outdoors,Books,Health & Beauty,Automotive,Food & Beverages,Toys & Games,Office Supplies',
                 'status' => 'required|in:active,inactive'
             ]);
 
@@ -173,6 +197,7 @@ class ProductController extends Controller
                 'description' => 'nullable|string',
                 'price' => 'sometimes|required|numeric|min:0',
                 'stock' => 'sometimes|required|integer|min:0',
+                'category' => 'sometimes|required|in:Electronics,Fashion,Home & Garden,Sports & Outdoors,Books,Health & Beauty,Automotive,Food & Beverages,Toys & Games,Office Supplies',
                 'status' => 'sometimes|required|in:active,inactive'
             ]);
 

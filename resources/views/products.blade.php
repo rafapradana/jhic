@@ -75,12 +75,6 @@
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Loading State -->
-        <div id="loading" class="flex justify-center items-center py-12">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <span class="ml-3 text-gray-600">Loading products...</span>
-        </div>
-
         <!-- Error State -->
         <div id="error" class="hidden bg-red-50 border border-red-200 rounded-lg p-6 mb-6">
             <div class="flex">
@@ -174,6 +168,23 @@
                     </select>
                 </div>
 
+                <!-- Sort By -->
+                <div class="flex-1 min-w-[140px]">
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Sort By</label>
+                    <select id="sort-filter" 
+                            class="w-full px-2 py-1.5 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white">
+                        <option value="updated_at_desc">Last Updated</option>
+                        <option value="created_at_desc">Newest First</option>
+                        <option value="created_at_asc">Oldest First</option>
+                        <option value="name_asc">Name A-Z</option>
+                        <option value="name_desc">Name Z-A</option>
+                        <option value="price_asc">Price Low-High</option>
+                        <option value="price_desc">Price High-Low</option>
+                        <option value="stock_asc">Stock Low-High</option>
+                        <option value="stock_desc">Stock High-Low</option>
+                    </select>
+                </div>
+
                 <!-- Action Buttons -->
                 <div class="flex gap-2">
                     <button id="clear-filters" 
@@ -186,6 +197,12 @@
                     </button>
                 </div>
             </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading" class="flex justify-center items-center py-12">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <span class="ml-3 text-gray-600">Loading products...</span>
         </div>
 
         <!-- Products Grid -->
@@ -223,7 +240,8 @@
             minStock: '',
             maxStock: '',
             category: '',
-            status: ''
+            status: '',
+            sortBy: 'updated_at_desc'
         };
 
         // Fetch and display products
@@ -251,6 +269,7 @@
                 if (filters.maxStock) url.searchParams.append('max_stock', filters.maxStock);
                 if (filters.category) url.searchParams.append('category', filters.category);
                 if (filters.status !== '') url.searchParams.append('is_active', filters.status);
+                if (filters.sortBy) url.searchParams.append('sort_by', filters.sortBy);
                 
                 const response = await fetch(url);
                 const data = await response.json();
@@ -531,7 +550,8 @@
                 minStock: document.getElementById('min-stock').value,
                 maxStock: document.getElementById('max-stock').value,
                 category: document.getElementById('category-filter').value,
-                status: document.getElementById('status-filter').value
+                status: document.getElementById('status-filter').value,
+                sortBy: document.getElementById('sort-filter').value
             };
         }
 
@@ -547,6 +567,7 @@
             document.getElementById('max-stock').value = '';
             document.getElementById('category-filter').value = '';
             document.getElementById('status-filter').value = '';
+            document.getElementById('sort-filter').value = 'updated_at_desc';
             
             currentFilters = {
                 minPrice: '',
@@ -554,7 +575,8 @@
                 minStock: '',
                 maxStock: '',
                 category: '',
-                status: ''
+                status: '',
+                sortBy: 'updated_at_desc'
             };
             
             loadProducts(1, currentSearch, currentFilters);
@@ -649,6 +671,33 @@
                     </span>
                 `;
             }
+
+            // Sort filter (only show if not default)
+            if (filters.sortBy && filters.sortBy !== 'updated_at_desc') {
+                hasActiveFilters = true;
+                const sortLabels = {
+                    'updated_at_desc': 'Last Updated',
+                    'created_at_desc': 'Newest First',
+                    'created_at_asc': 'Oldest First',
+                    'name_asc': 'Name A-Z',
+                    'name_desc': 'Name Z-A',
+                    'price_asc': 'Price Low-High',
+                    'price_desc': 'Price High-Low',
+                    'stock_asc': 'Stock Low-High',
+                    'stock_desc': 'Stock High-Low'
+                };
+                const sortText = sortLabels[filters.sortBy] || filters.sortBy;
+                indicatorsContainer.innerHTML += `
+                    <span class="filter-indicator inline-flex items-center gap-1 px-3 py-1 text-xs font-medium bg-orange-50 text-orange-700 border border-orange-200 rounded-full">
+                        Sort: ${sortText}
+                        <button onclick="clearSortFilter()" class="ml-1 hover:bg-orange-200 rounded-full p-0.5">
+                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </span>
+                `;
+            }
             
             // Show/hide clear all button
             if (clearAllBtn) {
@@ -676,6 +725,11 @@
 
         function clearStatusFilter() {
             document.getElementById('status-filter').value = '';
+            applyFilters();
+        }
+
+        function clearSortFilter() {
+            document.getElementById('sort-filter').value = 'updated_at_desc';
             applyFilters();
         }
 
@@ -857,8 +911,12 @@
                             Cancel
                         </button>
                         <button type="submit" id="submit-btn"
-                                class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md">
-                            Save
+                                class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md flex items-center justify-center">
+                            <span id="submit-text">Save</span>
+                            <svg id="submit-spinner" class="hidden animate-spin ml-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
                         </button>
                     </div>
                 </form>
@@ -953,8 +1011,20 @@
         productForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            // Show loading state
+            const submitBtn = document.getElementById('submit-btn');
+            const submitText = document.getElementById('submit-text');
+            const submitSpinner = document.getElementById('submit-spinner');
+            
+            submitBtn.disabled = true;
+            submitText.textContent = 'Saving...';
+            submitSpinner.classList.remove('hidden');
+            
             const formData = new FormData(productForm);
             const data = Object.fromEntries(formData);
+            
+            // Debug: log the data being sent
+            console.log('Form data being sent:', data);
             
             try {
                 const url = currentProductId ? `/api/products/${currentProductId}` : '/api/products';
@@ -981,6 +1051,11 @@
             } catch (error) {
                 console.error('Error saving product:', error);
                 showNotification('Failed to save product', 'error');
+            } finally {
+                // Reset loading state
+                submitBtn.disabled = false;
+                submitText.textContent = 'Save';
+                submitSpinner.classList.add('hidden');
             }
         });
 
